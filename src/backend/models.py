@@ -6,8 +6,6 @@ import uuid
 
 db = SQLAlchemy()
 
-
-
 class TicketStatus(Enum):
     OPEN = "open"
     IN_PROGRESS = "in_progress"
@@ -25,9 +23,24 @@ class Ticket(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-
-
     @staticmethod
     def generate_id():
         """Generate unique ticket ID"""
-        return f"TKT-{uuid.uuid4().hex[:8].upper()}"    
+        return f"TKT-{uuid.uuid4().hex[:8].upper()}"   
+
+class User(db.Model):
+    __tablename__ = 'users'
+
+    user_id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String, unique=True, nullable=False)
+    name = db.Column(db.String, nullable=False)
+    role = db.Column(db.String, nullable=False, default='user')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    @staticmethod
+    def generated_user_id():
+        """Generate unique user ID"""
+        return f"USR-{uuid.uuid4().hex[:8].upper()}"   
+
+    
+
