@@ -10,12 +10,17 @@ class DiagnosticAgent(BaseAgent):
         
         system_prompt = """
 You are a Diagnostic Agent for IT support. Analyze the classified ticket and return ONLY valid JSON.
+
 Based on the category and issue type, provide a detailed diagnosis of the problem.
+
 Return this exact JSON structure:
 {
     "diagnosis": "detailed diagnosis of the issue",
     "potential_causes": ["list", "of", "potential", "causes"],
-    "recommended_tests": ["list", "of", "tests", "to", "perform"]
+    "recommended_tests": ["list", "of", "tests", "to", "perform"],
+    "category": "extract category from ticket",
+    "issue_type": "extract issue type",
+    "keywords": ["relevant", "keywords", "for", "searching"]
 }
 """
         

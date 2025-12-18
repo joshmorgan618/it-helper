@@ -21,7 +21,7 @@ class RedisDB:
     
     def store_resolution(self, ticket_id, category, solution, success):
         try:
-            key = f"ticket:{ticket_id}"  # ✅ Add prefix
+            key = f"ticket:{ticket_id}"
             self.client.hset(key, mapping={
                 "id": ticket_id,
                 "category": category,

@@ -42,5 +42,51 @@ class User(db.Model):
         """Generate unique user ID"""
         return f"USR-{uuid.uuid4().hex[:8].upper()}"   
 
+
+class Classifications(db.Model):
+    __tablename__ = 'classifications'
+
+
+    ticket_id = db.Column(db.String, db.ForeignKey('tickets.id'), primary_key=True)
+    category = db.Column(db.String, nullable=False)
+    urgency = db.Column(db.String, nullable=False)
+    expertise_level = db.Column(db.String, nullable=False)
+    reasoning = db.Column(db.String, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class Diagnostics(db.Model):
+    __tablename__ = 'diagnostics'
+
+    ticket_id = db.Column(db.String, db.ForeignKey('tickets.id'), primary_key=True)
+    diagnosis = db.Column(db.String, nullable=False)
+    potential_causes = db.Column(db.JSON, nullable=False)
+    recommended_tests = db.Column(db.JSON, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class Solutions(db.Model):
+    __tablename__ = 'solutions'
+    ticket_id = db.Column(db.String, db.ForeignKey('tickets.id'), primary_key=True)
+    solution = db.Column(db.String, nullable=False)
+    tools_needed = db.Column(db.JSON, nullable=False)
+    estimated_time = db.Column(db.String, nullable=False)
+    confidence = db.Column(db.String, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Workflow_log(db.Model):
+    __tablename__ = 'workflow_log'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ticket_id = db.Column(db.String, db.ForeignKey('tickets.id'), nullable=False)
+    log_entries = db.Column(db.JSON, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+
     
 
