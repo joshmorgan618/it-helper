@@ -7,6 +7,7 @@ from mas_agents.classifier_agent import ClassifierAgent
 from mas_agents.diagnostic_agent import DiagnosticAgent
 from mas_agents.fetch_agent import FetchAgent
 from mas_agents.solution_agent import SolutionAgent
+from assignment import assign_ticket
 
 class Overseer:
     def __init__(self, client, redis_client):
@@ -31,7 +32,16 @@ class Overseer:
             return {"error": "Classification failed", "workflow_log": workflow_log}
         workflow_log.append(f"ClassifierAgent: Classified as {classification_result['category']} - {classification_result['urgency']}")
         
-        # Step 3: Diagnose
+        assignments = assign_ticket(intake_result, classification_result)
+        if not assignments or assignments is None:
+            print("No assignments returned from assign_ticket")
+            assignments = {'primary': None, 'secondary': None}
+            workflow_log.append("AssignmentService: Assignment failed - no users found")
+        else:
+            print("Assignments:", assignments)
+            primary_name = assignments.get('primary', {}).get('name', 'None') if assignments.get('primary') else 'None'
+            secondary_name = assignments.get('secondary', {}).get('name', 'None') if assignments.get('secondary') else 'None'
+        workflow_log.append(f"AssignmentService: Primary={primary_name}, Secondary={secondary_name}")
         diagnostic_result = self.diagnostic_agent.process(classification_result)
         if not diagnostic_result:
             return {"error": "Diagnostic failed", "workflow_log": workflow_log}
@@ -54,6 +64,7 @@ class Overseer:
         return {
             "intake_result": intake_result,
             "classification": classification_result,
+            "assignments": assignments,
             "diagnosis": diagnostic_result,
             "fetched_data": fetch_result,
             "solution": solution_result,

@@ -6,6 +6,7 @@ from anthropic import Anthropic
 from redis_client import RedisDB  
 from overseer import Overseer 
 from flask_cors import CORS
+from models import TicketAssignments
 
 load_dotenv()
 
@@ -84,6 +85,24 @@ def create_ticket():
             confidence=solution_result["confidence"]
         )
         db.session.add(solution)
+
+        assignments = overseer_result.get("assignments", {})
+        if assignments.get('primary'):
+            primary_assignment = TicketAssignments(
+                ticket_id=ticket.id,
+                user_id=assignments['primary']['user_id'],
+                role='primary'
+            )
+            db.session.add(primary_assignment)
+
+        if assignments.get('secondary'):
+            secondary_assignment = TicketAssignments(
+                ticket_id=ticket.id,
+                user_id=assignments['secondary']['user_id'],
+                role='secondary'
+            )
+            db.session.add(secondary_assignment)
+
         
         # Create workflow log
         log = Workflow_log(
