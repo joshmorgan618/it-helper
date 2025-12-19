@@ -1,4 +1,4 @@
-from src.mas_agents.base_agent import BaseAgent
+from .base_agent import BaseAgent
 import json
 
 class ClassifierAgent(BaseAgent):

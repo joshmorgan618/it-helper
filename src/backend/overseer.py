@@ -1,9 +1,12 @@
-from src.mas_agents.intake_agent import IntakeAgent
-from src.mas_agents.classifier_agent import ClassifierAgent
-from src.mas_agents.diagnostic_agent import DiagnosticAgent
-from src.mas_agents.fetch_agent import FetchAgent
-from src.mas_agents.solution_agent import SolutionAgent  # Build this next!
-import json
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
+from mas_agents.intake_agent import IntakeAgent
+from mas_agents.classifier_agent import ClassifierAgent
+from mas_agents.diagnostic_agent import DiagnosticAgent
+from mas_agents.fetch_agent import FetchAgent
+from mas_agents.solution_agent import SolutionAgent
 
 class Overseer:
     def __init__(self, client, redis_client):

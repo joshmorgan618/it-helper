@@ -3,7 +3,6 @@ from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from enum import Enum
 import uuid
-
 db = SQLAlchemy()
 
 class TicketStatus(Enum):
@@ -31,16 +30,33 @@ class Ticket(db.Model):
 class User(db.Model):
     __tablename__ = 'users'
 
-    user_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     email = db.Column(db.String, unique=True, nullable=False)
     name = db.Column(db.String, nullable=False)
     role = db.Column(db.String, nullable=False, default='user')
+    tier_level = db.Column(db.String, nullable=False, default='tier1')
+    specialization = db.Column(db.String, nullable=True)
+    building = db.Column(db.String, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     @staticmethod
     def generated_user_id():
         """Generate unique user ID"""
         return f"USR-{uuid.uuid4().hex[:8].upper()}"   
+
+class TicketAssignments(db.Model):
+    __tablename__ = 'ticket_assignments'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ticket_id = db.Column(db.String, db.ForeignKey('tickets.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    role = db.Column(db.String, nullable=False)
+    assigned_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+
+
+
 
 
 class Classifications(db.Model):

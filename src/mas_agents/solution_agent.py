@@ -1,4 +1,4 @@
-from src.mas_agents.base_agent import BaseAgent
+from .base_agent import BaseAgent
 import json
 
 class SolutionAgent(BaseAgent):
@@ -18,15 +18,15 @@ class SolutionAgent(BaseAgent):
         system_prompt = """
 You are a Solution Agent for IT support. Based on the diagnosis and fetched data, provide a comprehensive solution.
 
-Consider the diagnosis, potential causes, and any similar past solutions to create an effective fix.
+IMPORTANT: Return ONLY valid JSON. For multi-line text, use \\n for newlines.
 
 Return this exact JSON structure:
 {
-    "solution": "detailed solution steps",
-    "tools_needed": ["list", "of", "tools", "or", "resources"],
-    "estimated_time": "time to resolve the issue",
+    "solution": "Step 1: Do this\\nStep 2: Do that\\nStep 3: Complete",
+    "tools_needed": ["tool1", "tool2"],
+    "estimated_time": "time estimate",
     "confidence": "high|medium|low",
-    "alternative_solutions": ["optional", "backup", "approaches"]
+    "alternative_solutions": ["option1", "option2"]
 }
 """
         

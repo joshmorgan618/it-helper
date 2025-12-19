@@ -1,5 +1,6 @@
 import json
 
+
 class FetchAgent:
     """Knowledge retrieval agent - searches databases for relevant information"""
     

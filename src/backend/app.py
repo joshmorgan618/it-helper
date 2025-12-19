@@ -5,10 +5,12 @@ from models import db, Ticket, Classifications, Diagnostics, Solutions, Workflow
 from anthropic import Anthropic 
 from redis_client import RedisDB  
 from overseer import Overseer 
+from flask_cors import CORS
 
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
@@ -52,6 +54,7 @@ def create_ticket():
             description=intake_result['description']
         )
         db.session.add(ticket)
+        db.session.flush()
         
         # Create classification
         classification = Classifications(
@@ -166,3 +169,4 @@ def fetch_ticket(ticket_id):
 
 if __name__ == '__main__':
     app.run(debug=True)
+    
