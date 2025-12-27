@@ -9,6 +9,8 @@ from mas_agents.fetch_agent import FetchAgent
 from mas_agents.solution_agent import SolutionAgent
 from assignment import assign_ticket
 
+
+# Overseer class to manage the workflow
 class Overseer:
     def __init__(self, client, redis_client):
         self.intake_agent = IntakeAgent(client)

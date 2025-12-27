@@ -14,26 +14,23 @@ class FetchAgent:
     
     def process(self, query_data):
         """
-        Search for relevant documentation and past solutions
-        
+        Search for relevant past solutions
+
         Args:
-            query_data: dict with 'category' and optional 'keywords'
+            query_data: dict with 'category'
             Example: {
-                "category": "hardware",
-                "issue_type": "printer",
-                "keywords": ["connection", "network"]
+                "category": "hardware"
             }
-        
+
         Returns:
-            dict with search results
+            dict with past_solutions list
         """
         self.log_action(f"Searching for category: {query_data.get('category')}")
-        
+
         results = {
-            "past_solutions": [],
-            "search_query": query_data
+            "past_solutions": []
         }
-        
+
         # Search Redis for similar past tickets
         if self.redis_client:
             try:
@@ -46,10 +43,7 @@ class FetchAgent:
             except Exception as e:
                 self.log_action(f"Error searching Redis: {e}")
                 results['past_solutions'] = []
-        
+
         # TODO: Add ChromaDB search when implemented
-        # if self.chroma_client:
-        #     docs = self.chroma_client.search(query_data.get('keywords'))
-        #     results['documentation'] = docs
-        
+
         return results

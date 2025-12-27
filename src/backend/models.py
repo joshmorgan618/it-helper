@@ -5,12 +5,14 @@ from enum import Enum
 import uuid
 db = SQLAlchemy()
 
+# Define Ticket Status Enum
 class TicketStatus(Enum):
     OPEN = "open"
     IN_PROGRESS = "in_progress"
     RESOLVED = "resolved"
     CLOSED = "closed"
 
+#Define Ticket Model
 class Ticket(db.Model):
     __tablename__ = 'tickets'
 
@@ -22,11 +24,13 @@ class Ticket(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    #Generate Ticked ID
     @staticmethod
     def generate_id():
         """Generate unique ticket ID"""
         return f"TKT-{uuid.uuid4().hex[:8].upper()}"   
 
+#Define User Model
 class User(db.Model):
     __tablename__ = 'users'
 
@@ -44,6 +48,7 @@ class User(db.Model):
         """Generate unique user ID"""
         return f"USR-{uuid.uuid4().hex[:8].upper()}"   
 
+#Define TicketAssignments Model 
 class TicketAssignments(db.Model):
     __tablename__ = 'ticket_assignments'
 
@@ -54,14 +59,8 @@ class TicketAssignments(db.Model):
     assigned_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
-
-
-
-
-
 class Classifications(db.Model):
     __tablename__ = 'classifications'
-
 
     ticket_id = db.Column(db.String, db.ForeignKey('tickets.id'), primary_key=True)
     category = db.Column(db.String, nullable=False)

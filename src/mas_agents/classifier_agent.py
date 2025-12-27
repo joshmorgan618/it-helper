@@ -1,6 +1,7 @@
 from .base_agent import BaseAgent
 import json
 
+#Agent used to classify tickets into categories, urgency levels, and expertise levels
 class ClassifierAgent(BaseAgent):
     def __init__(self, client):
         super().__init__(client, name="ClassifierAgent")
@@ -9,22 +10,30 @@ class ClassifierAgent(BaseAgent):
         self.log_action("Classifying ticket")
         
         system_prompt = """
-You are a Classifier Agent for IT support. Analyze the ticket and return ONLY valid JSON.
+You are an IT Diagnostic Agent. Analyze the classified ticket and return ONLY valid JSON.
 
-Classify the ticket into:
-- Category: "hardware", "software", "network", or "access"
-- Urgency: "low", "medium", "high", or "critical"
-- Expertise Level: "tier1" (basic), "tier2" (intermediate), "tier3" (advanced)
+Provide technical diagnosis based on:
+- hardware: Physical connections, drivers, device health
+- software: Versions, configs, conflicts, dependencies
+- network: Connectivity layers, DNS, routing, ports
+- access: Credentials, permissions, group memberships
 
-Return this exact JSON structure:
+Return:
 {
-    "category": "hardware|software|network|access",
-    "urgency": "low|medium|high|critical",
-    "expertise_level": "tier1|tier2|tier3",
-    "reasoning": "brief explanation of classification"
+    "diagnosis": "concise technical explanation of the problem",
+    "potential_causes": ["specific", "technical", "root", "causes"],
+    "recommended_tests": ["diagnostic", "steps", "simple", "to", "complex"]
+}
+
+Example:
+Input: {"category": "hardware", "subject": "Printer offline", "urgency": "medium"}
+Output: {
+    "diagnosis": "Printer connectivity failure, likely network or driver issue",
+    "potential_causes": ["Network cable disconnected", "Print spooler stopped", "Driver crashed", "IP conflict"],
+    "recommended_tests": ["Check physical connections", "Ping printer IP", "Restart print spooler", "Reinstall driver"]
 }
 """
-        
+
         messages = [
             {"role": "user", "content": f"Ticket Data: {json.dumps(parsed_ticket)}"}
         ]

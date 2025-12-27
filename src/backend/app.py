@@ -1,10 +1,10 @@
 from os import getenv
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify
-from models import db, Ticket, Classifications, Diagnostics, Solutions, Workflow_log
-from anthropic import Anthropic 
-from redis_client import RedisDB  
-from overseer import Overseer 
+from models import db, Ticket, Classifications, Diagnostics, Solutions, Workflow_log, User
+from anthropic import Anthropic
+from redis_client import RedisDB
+from overseer import Overseer
 from flask_cors import CORS
 from models import TicketAssignments
 
@@ -27,7 +27,65 @@ with app.app_context():
     print("Database tables created!")
 
 
-@app.route('/api/tickets', methods=['POST'])
+@app.route('/api/tickets', methods=['GET', 'POST'])
+def tickets():
+    if request.method == 'GET':
+        # Fetch all tickets with related data
+        all_tickets = Ticket.query.order_by(Ticket.created_at.desc()).all()
+        tickets_data = []
+
+        for ticket in all_tickets:
+            classification = Classifications.query.filter_by(ticket_id=ticket.id).first()
+            diagnostic = Diagnostics.query.filter_by(ticket_id=ticket.id).first()
+            solution = Solutions.query.filter_by(ticket_id=ticket.id).first()
+
+            # Fetch assignments with user details
+            assignments = TicketAssignments.query.filter_by(ticket_id=ticket.id).all()
+            assigned_people = []
+            for assignment in assignments:
+                user = db.session.get(User, assignment.user_id)
+                if user:
+                    assigned_people.append({
+                        "role": assignment.role,
+                        "name": user.name,
+                        "email": user.email,
+                        "specialization": user.specialization,
+                        "tier_level": user.tier_level,
+                        "assigned_at": assignment.assigned_at.isoformat()
+                    })
+
+            ticket_data = {
+                "id": ticket.id,
+                "user_email": ticket.user_email,
+                "subject": ticket.subject,
+                "description": ticket.description,
+                "status": ticket.status.value,
+                "created_at": ticket.created_at.isoformat(),
+                "updated_at": ticket.updated_at.isoformat(),
+                "classification": {
+                    "category": classification.category,
+                    "urgency": classification.urgency,
+                    "expertise_level": classification.expertise_level,
+                    "reasoning": classification.reasoning
+                } if classification else None,
+                "diagnosis": {
+                    "diagnosis": diagnostic.diagnosis,
+                    "potential_causes": diagnostic.potential_causes,
+                    "recommended_tests": diagnostic.recommended_tests
+                } if diagnostic else None,
+                "solution": {
+                    "solution": solution.solution,
+                    "tools_needed": solution.tools_needed,
+                    "estimated_time": solution.estimated_time,
+                    "confidence": solution.confidence
+                } if solution else None,
+                "assigned_people": assigned_people
+            }
+            tickets_data.append(ticket_data)
+
+        return jsonify(tickets_data), 200
+
+    # POST method - create ticket
 def create_ticket():
     data = request.get_json()
     if not data or not all(k in data for k in ('user_email', 'subject', 'description')):
@@ -102,8 +160,7 @@ def create_ticket():
                 role='secondary'
             )
             db.session.add(secondary_assignment)
-
-        
+    
         # Create workflow log
         log = Workflow_log(
             ticket_id=ticket.id,
@@ -141,7 +198,7 @@ def create_ticket():
 
 @app.route('/api/tickets/<ticket_id>', methods=['GET'])
 def fetch_ticket(ticket_id):
-    ticket = Ticket.query.get(ticket_id)
+    ticket = db.session.get(Ticket, ticket_id)
     if not ticket:
         return {"error": "Ticket not found"}, 404
 
@@ -150,6 +207,21 @@ def fetch_ticket(ticket_id):
     diagnostic = Diagnostics.query.filter_by(ticket_id=ticket_id).first()
     solution = Solutions.query.filter_by(ticket_id=ticket_id).first()
     log = Workflow_log.query.filter_by(ticket_id=ticket_id).first()
+
+    # Fetch assignments with user details
+    assignments = TicketAssignments.query.filter_by(ticket_id=ticket_id).all()
+    assigned_people = []
+    for assignment in assignments:
+        user = db.session.get(User, assignment.user_id)
+        if user:
+            assigned_people.append({
+                "role": assignment.role,
+                "name": user.name,
+                "email": user.email,
+                "specialization": user.specialization,
+                "tier_level": user.tier_level,
+                "assigned_at": assignment.assigned_at.isoformat()
+            })
 
     return {
         "id": ticket.id,
@@ -182,6 +254,7 @@ def fetch_ticket(ticket_id):
             "created_at": solution.created_at.isoformat() if solution else None,
             "updated_at": solution.updated_at.isoformat() if solution else None
         } if solution else None,
+        "assigned_people": assigned_people,
         "workflow_log": log.log_entries if log else []
     }
     

@@ -1,6 +1,7 @@
 from .base_agent import BaseAgent
 import json
 
+#Agent used to generate solutions based on diagnosis and fetched data
 class SolutionAgent(BaseAgent):
     def __init__(self, client):
         super().__init__(client, name="SolutionAgent")
@@ -25,20 +26,16 @@ Return this exact JSON structure:
     "solution": "Step 1: Do this\\nStep 2: Do that\\nStep 3: Complete",
     "tools_needed": ["tool1", "tool2"],
     "estimated_time": "time estimate",
-    "confidence": "high|medium|low",
-    "alternative_solutions": ["option1", "option2"]
+    "confidence": "high|medium|low"
 }
 """
-        
         messages = [
             {
                 "role": "user", 
                 "content": f"Diagnosis: {json.dumps(diagnosis)}\n\nFetched Data: {json.dumps(fetched_data)}"
             }
         ]
-        
         response = self.call_claude(messages, system_prompt)
-        
         if not response:
             self.log_action("Failed to get response from Claude")
             return None

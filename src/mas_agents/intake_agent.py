@@ -1,6 +1,7 @@
 from .base_agent import BaseAgent
 import json
 
+# Agent used to intake and parse new tickets
 class IntakeAgent(BaseAgent):
     def __init__(self, client):
         super().__init__(client, name="IntakeAgent")
@@ -13,24 +14,13 @@ You are an Intake Agent for IT support. Analyze the ticket and return ONLY valid
 
 Extract and structure the following:
 - Clean up the subject line
-- Improve the description
-- Extract: device_type, location, issue_type, urgency
-- List any missing information
-- Validate the ticket
+- Improve and clarify the description with any relevant details from the input
 
 Return this exact JSON structure:
 {
     "user_email": "email from input",
     "subject": "cleaned subject",
-    "description": "improved description",
-    "extracted_info": {
-        "device_type": "printer/computer/network/etc",
-        "location": "floor or building",
-        "issue_type": "connection/software/hardware/etc",
-        "urgency": "low/medium/high/critical"
-    },
-    "missing_info": ["list", "of", "missing", "details"],
-    "valid": true
+    "description": "improved description"
 }
 """
         
