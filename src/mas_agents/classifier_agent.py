@@ -16,7 +16,7 @@ Provide technical diagnosis based on:
 - hardware: Physical connections, drivers, device health
 - software: Versions, configs, conflicts, dependencies
 - network: Connectivity layers, DNS, routing, ports
-- access: Credentials, permissions, group memberships
+- access: Credentials, perm       issions, group memberships
 
 Return:
 {
