@@ -205,3 +205,13 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# IT Helper Specific
+*.pem
+*.key
+secrets.json
+credentials.json
+dump.rdb
+.claude/settings.local.json
+node_modules/
+src/frontend/build/
